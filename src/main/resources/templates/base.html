@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${title}">Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex">
+
+<!-- ================= SIDEBAR ================= -->
+<aside class="w-64 bg-gradient-to-b from-blue-700 to-blue-900 text-white flex flex-col">
+
+    <!-- Logo -->
+    <div class="p-5 text-2xl font-bold border-b border-blue-500">
+        🎓 Alumni
+    </div>
+
+    <!-- Menu -->
+    <nav class="flex-1 p-4 space-y-2">
+
+        <a th:href="@{/dashboard}"
+           class="block px-4 py-2 rounded hover:bg-blue-600 transition">
+            🏠 Dashboard
+        </a>
+
+        <a th:href="@{/profile}"
+           class="block px-4 py-2 rounded hover:bg-blue-600 transition">
+            👤 Profile
+        </a>
+
+        <!-- ADMIN -->
+        <a sec:authorize="hasAuthority('administrator')"
+           th:href="@{/administrator/users}"
+           class="block px-4 py-2 rounded hover:bg-blue-600 transition">
+            ⚙️ Admin Panel
+        </a>
+
+        <!-- ADMIN + USER -->
+        <a sec:authorize="hasAnyAuthority('admin','administrator')"
+           th:href="@{/admin/manage}"
+           class="block px-4 py-2 rounded hover:bg-blue-600 transition">
+            📊 Manage
+        </a>
+
+        <!-- USER -->
+        <a sec:authorize="hasAnyAuthority('user','administrator','admin')"
+           th:href="@{/user/data}"
+           class="block px-4 py-2 rounded hover:bg-blue-600 transition">
+            📁 My Data
+        </a>
+
+        <!-- VIEWER -->
+        <a sec:authorize="hasAnyAuthority('viewer','admin','administrator')"
+           th:href="@{/viewer/report}"
+           class="block px-4 py-2 rounded hover:bg-blue-600 transition">
+            📄 Reports
+        </a>
+
+    </nav>
+
+    <!-- Logout -->
+    <div class="p-4 border-t border-blue-500">
+        <a th:href="@{/logout}"
+           class="block text-center bg-red-500 hover:bg-red-600 py-2 rounded">
+            🚪 Logout
+        </a>
+    </div>
+</aside>
+
+<!-- ================= MAIN CONTENT ================= -->
+<div class="flex-1 flex flex-col">
+
+    <!-- ================= TOPBAR ================= -->
+    <header class="bg-white shadow flex justify-between items-center px-6 py-4">
+
+        <h1 class="text-xl font-semibold text-gray-700">
+            Dashboard
+        </h1>
+
+        <!-- User Info -->
+        <div class="flex items-center gap-4">
+
+            <span class="text-gray-600 font-medium"
+                  sec:authentication="name">
+                User Email
+            </span>
+
+            <!-- Avatar -->
+            <div class="w-10 h-10 bg-blue-600 text-white flex items-center justify-center rounded-full font-bold">
+                <span sec:authentication="name"
+                      th:text="${#strings.substring(#authentication.name,0,1).toUpperCase()}">
+                    U
+                </span>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- ================= PAGE CONTENT ================= -->
+    <main class="flex-1 p-6 overflow-auto">
+
+        <!-- Dynamic page load -->
+        <div th:replace="~{${page} :: content}"></div>
+
+    </main>
+
+    <!-- ================= FOOTER ================= -->
+    <footer class="bg-white text-center py-3 shadow text-gray-600">
+        © 2026 Alumni System | Developed with ❤️
+    </footer>
+
+</div>
+
+</body>
+</html>

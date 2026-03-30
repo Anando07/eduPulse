@@ -1,21 +1,30 @@
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
-      th:replace="~{layouts/public_layout :: layout (~{::title}, ~{::content})}">
-
 <div th:fragment="content">
-
     <div class="container mt-20 mx-auto" style="max-width:400px;">
         <div class="bg-white p-8 rounded-lg shadow-lg">
 
             <h3 class="text-2xl font-bold text-center mb-6">Login</h3>
 
-            <form th:action="@{/login}" method="post" class="space-y-4">
+            <!-- Error message if login fails -->
+            <div th:if="${param.error}" class="bg-red-100 text-red-700 p-3 rounded mb-4 text-center">
+                Invalid email or password
+            </div>
+
+            <!-- Success message if logout -->
+            <div th:if="${param.logout}" class="bg-green-100 text-green-700 p-3 rounded mb-4 text-center">
+                You have been logged out successfully
+            </div>
+
+            <form th:action="@{/do-login}" method="post" class="space-y-4">
 
                 <input type="email" name="username" placeholder="Email"
-                       class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                       class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" required>
 
                 <input type="password" name="password" placeholder="Password"
-                       class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                       class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+
+                <div class="flex justify-between items-center">
+                    <a th:href="@{/forgot-password}" class="text-blue-600 hover:underline text-sm">Forgot Password?</a>
+                </div>
 
                 <button type="submit"
                         class="w-full bg-blue-600 text-white p-3 rounded font-semibold hover:bg-blue-700 transition">
@@ -30,6 +39,4 @@
 
         </div>
     </div>
-
 </div>
-</html>

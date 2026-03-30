@@ -1,51 +1,149 @@
+<!-- src/main/resources/templates/register.html -->
+<div th:fragment="content" class="max-w-5xl mx-auto p-6">
+    <div class="bg-white shadow-xl rounded-2xl p-8 md:p-12">
+        <h1 class="text-3xl md:text-4xl font-bold mb-8 text-center text-gray-800"
+            th:text="${userDTO.id == null} ? 'Register' : 'Update Profile'">Register</h1>
 
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
-      th:replace="~{layouts/public_layout :: layout (~{::title}, ~{::content})}">
+        <form th:action="@{/register}" th:object="${userDTO}" method="post" enctype="multipart/form-data" class="space-y-8">
 
-<div class="container mt-5">
-
-    <div class="card p-4">
-
-        <h3 class="text-center mb-4">Registration</h3>
-
-        <form>
-
-            <div class="row">
-
-                <div class="col-md-6">
-                    <input class="form-control mb-3" placeholder="Full Name">
+            <!-- ================= BASIC INFO ================= -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block font-medium mb-1">Full Name *</label>
+                    <input type="text" th:field="*{name}" placeholder="Enter full name" required
+                           class="border rounded-lg px-4 py-3 w-full focus:ring-2 focus:ring-blue-400 focus:outline-none">
+                    <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="text-red-600 text-sm mt-1"></p>
                 </div>
 
-                <div class="col-md-6">
-                    <input class="form-control mb-3" placeholder="Email">
+                <div>
+                    <label class="block font-medium mb-1">Email *</label>
+                    <input type="email" th:field="*{email}" placeholder="Enter email" required
+                           class="border rounded-lg px-4 py-3 w-full focus:ring-2 focus:ring-blue-400 focus:outline-none">
+                    <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="text-red-600 text-sm mt-1"></p>
                 </div>
 
-                <div class="col-md-6">
-                    <input class="form-control mb-3" placeholder="Phone">
+                <div>
+                    <label class="block font-medium mb-1">Password *</label>
+                    <input type="password" th:field="*{password}" placeholder="Enter password"
+                           th:required="${userDTO.id == null}" 
+                           class="border rounded-lg px-4 py-3 w-full focus:ring-2 focus:ring-blue-400 focus:outline-none">
+                    <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="text-red-600 text-sm mt-1"></p>
                 </div>
 
-                <div class="col-md-6">
-                    <input class="form-control mb-3" placeholder="Passing Year">
+                <div>
+                    <label class="block font-medium mb-1">Confirm Password *</label>
+                    <input type="password" th:field="*{confirmPassword}" placeholder="Confirm password"
+                           th:required="${userDTO.id == null}" 
+                           class="border rounded-lg px-4 py-3 w-full focus:ring-2 focus:ring-blue-400 focus:outline-none">
+                    <p th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}" class="text-red-600 text-sm mt-1"></p>
                 </div>
 
-                <div class="col-md-6">
-                    <input type="password" class="form-control mb-3" placeholder="Password">
+                <div>
+                    <label class="block font-medium mb-1">Phone *</label>
+                    <input type="text" th:field="*{phone}" placeholder="Enter phone number" required
+                           class="border rounded-lg px-4 py-3 w-full focus:ring-2 focus:ring-blue-400 focus:outline-none">
+                    <p th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}" class="text-red-600 text-sm mt-1"></p>
                 </div>
 
-                <div class="col-md-6">
-                    <input type="password" class="form-control mb-3" placeholder="Confirm Password">
+                <div>
+                    <label class="block font-medium mb-1">Blood Group *</label>
+                    <select th:field="*{bloodGroup}" class="border rounded-lg px-4 py-3 w-full focus:ring-2 focus:ring-blue-400 focus:outline-none" required>
+                        <option value="">Select Blood Group</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                    </select>
                 </div>
-
             </div>
 
-            <button class="btn btn-primary w-100">Register</button>
+            <!-- ================= ACADEMIC INFO ================= -->
+            <label class="block font-semibold text-gray-700 mb-2 mt-6">Academic Information</label>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <!-- SSC -->
+                <input type="text" th:field="*{sscInstitution}" placeholder="SSC Institution" class="border rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-400 focus:outline-none w-full">
+                <select th:field="*{sscGroup}" class="border rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-400 focus:outline-none w-full">
+                    <option value="">SSC Group</option>
+                    <option value="Science">Science</option>
+                    <option value="Arts">Arts</option>
+                    <option value="Commerce">Commerce</option>
+                </select>
+                <select th:field="*{sscBoard}" class="border rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-400 focus:outline-none w-full">
+                    <option value="">SSC Board</option>
+                    <option value="Dhaka">Dhaka</option>
+                    <option value="Chittagong">Chittagong</option>
+                    <option value="Rajshahi">Rajshahi</option>
+                    <option value="Khulna">Khulna</option>
+                    <option value="Barisal">Barisal</option>
+                    <option value="Sylhet">Sylhet</option>
+                    <option value="Dinajpur">Dinajpur</option>
+                    <option value="Comilla">Comilla</option>
+                </select>
+                <input type="number" th:field="*{sscPassingYear}" placeholder="SSC Year" class="border rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-400 focus:outline-none w-full">
+
+                <!-- HSC -->
+                <input type="text" th:field="*{hscInstitution}" placeholder="HSC Institution" class="border rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-400 focus:outline-none w-full">
+                <select th:field="*{hscGroup}" class="border rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-400 focus:outline-none w-full">
+                    <option value="">HSC Group</option>
+                    <option value="Science">Science</option>
+                    <option value="Arts">Arts</option>
+                    <option value="Commerce">Commerce</option>
+                </select>
+                <select th:field="*{hscBoard}" class="border rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-400 focus:outline-none w-full">
+                    <option value="">HSC Board</option>
+                    <option value="Dhaka">Dhaka</option>
+                    <option value="Chittagong">Chittagong</option>
+                    <option value="Rajshahi">Rajshahi</option>
+                    <option value="Khulna">Khulna</option>
+                    <option value="Barisal">Barisal</option>
+                    <option value="Sylhet">Sylhet</option>
+                    <option value="Dinajpur">Dinajpur</option>
+                    <option value="Comilla">Comilla</option>
+                </select>
+                <input type="number" th:field="*{hscPassingYear}" placeholder="HSC Year" class="border rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-400 focus:outline-none w-full">
+
+                <!-- University -->
+                <input type="text" th:field="*{universityInstitution}" placeholder="University Institution" class="border rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-400 focus:outline-none w-full">
+                <input type="text" th:field="*{universitySubject}" placeholder="University Subject" class="border rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-400 focus:outline-none w-full">
+                <input type="text" th:field="*{universityRoll}" placeholder="University Roll" class="border rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-400 focus:outline-none w-full">
+                <input type="number" th:field="*{universityPassingYear}" placeholder="University Year" class="border rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-400 focus:outline-none w-full">
+            </div>
+
+            <!-- ================= PROFESSIONAL INFO ================= -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <select th:field="*{jobType}" class="border rounded-lg px-4 py-3 w-full focus:ring-2 focus:ring-blue-400 focus:outline-none">
+                    <option value="">Select Job Type</option>
+                    <option value="Private">Private</option>
+                    <option value="Government">Government</option>
+                    <option value="Self-Employed">Self-Employed</option>
+                    <option value="Other">Other</option>
+                </select>
+                <input type="text" th:field="*{designation}" placeholder="Designation" class="border rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-400 focus:outline-none w-full">
+            </div>
+
+            <!-- ================= PROFILE IMAGE ================= -->
+            <div th:if="${userDTO.id != null}" class="mt-4">
+                <label class="block font-medium mb-1">Profile Image</label>
+                <input type="file" th:field="*{profileImage}" class="border rounded-lg px-4 py-3 w-full focus:ring-2 focus:ring-blue-400 focus:outline-none">
+                <div th:if="${userDTO.profileImage != null}" class="mt-2">
+                    <img th:src="@{/images/profile/{img}(img=${userDTO.profileImage})}" class="w-32 h-32 object-cover rounded-full border" alt="Profile Preview">
+                </div>
+            </div>
+
+            <!-- ================= SUBMIT & RESET BUTTON ================= -->
+            <div class="flex justify-center gap-6 mt-6">
+                <button type="reset" class="bg-gray-400 hover:bg-gray-500 text-white px-6 py-3 rounded-lg font-semibold transition duration-200">
+                    Reset
+                </button>
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition duration-200">
+                    <span th:text="${userDTO.id == null} ? 'Register' : 'Update'">Register</span>
+                </button>
+            </div>
 
         </form>
-
     </div>
-
 </div>
-
-</div>
-</html>
