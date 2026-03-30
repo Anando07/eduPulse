@@ -3,6 +3,10 @@ package com.edupulse.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -27,7 +31,7 @@ public class User {
 
     private String phone;
 
-    // User active or not
+    // Active status
     private boolean enabled = false;
 
     // ================= ROLE RELATION =================
@@ -75,7 +79,7 @@ public class User {
 
     // ================= PROFILE IMAGE =================
     @Column(name = "profile_image")
-    private String profileImage; // store filename or URL
+    private String profileImage;
 
     // ================= VERIFICATION =================
     private boolean emailVerified = false;
@@ -87,17 +91,18 @@ public class User {
     @Column(length = 10)
     private String phoneVerificationCode;
 
+    // ================= TIMESTAMPS =================
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
     // ================= DONATION RELATION =================
     @OneToMany(mappedBy = "donor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Donation> donations;
-
-    // ================= BUSINESS LOGIC =================
-    public void updateVerificationStatus() {
-        // Enable user if ANY one is verified
-        if (this.emailVerified || this.phoneVerified) {
-            this.enabled = true;
-        }
-    }
 
     public Long getId() {
         return id;
@@ -355,6 +360,22 @@ public class User {
         this.phoneVerificationCode = phoneVerificationCode;
     }
 
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
     public List<Donation> getDonations() {
         return donations;
     }
@@ -364,6 +385,6 @@ public class User {
     }
 
     // ================= GETTERS & SETTERS =================
-
+    // Generate all getters and setters (IDE can do this)
     
 }

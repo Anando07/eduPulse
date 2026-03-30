@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -27,9 +28,6 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    // =========================
-    // REGISTER USER (BEST PRACTICE)
-    // =========================
     @Override
     public User registerUser(UserDTO userDTO) {
 
@@ -49,40 +47,35 @@ public class UserServiceImpl implements UserService {
 
         user.setRoles(new HashSet<>(Set.of(role)));
 
+        // Default flags
         user.setEmailVerified(false);
         user.setPhoneVerified(false);
-        user.setEnabled(false);
+        user.setEnabled(true); // make true if user can login immediately
 
         return userRepository.save(user);
     }
 
-    // =========================
-    // CHECK EMAIL EXISTS
-    // =========================
     @Override
     public boolean existsByEmail(String email) {
         return userRepository.findByEmail(email).isPresent();
     }
 
-    // =========================
-    // DTO → ENTITY CONVERSION
-    // =========================
     @Override
     public User convertToEntity(UserDTO userDTO) {
-
         User user = new User();
-
         user.setName(userDTO.getName());
         user.setEmail(userDTO.getEmail());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setPhone(userDTO.getPhone());
         user.setBloodGroup(userDTO.getBloodGroup());
 
+        user.setSscBoard(userDTO.getSscBoard());
         user.setSscInstitution(userDTO.getSscInstitution());
         user.setSscGroup(userDTO.getSscGroup());
         user.setSscRoll(userDTO.getSscRoll());
         user.setSscPassingYear(userDTO.getSscPassingYear());
 
+        user.setHscBoard(userDTO.getHscBoard());
         user.setHscInstitution(userDTO.getHscInstitution());
         user.setHscGroup(userDTO.getHscGroup());
         user.setHscRoll(userDTO.getHscRoll());
@@ -105,27 +98,35 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
-    // =========================
-    // SAVE USER
-    // =========================
     @Override
     public User saveUser(User user) {
         return userRepository.save(user);
     }
 
-    // =========================
-    // FIND BY EMAIL
-    // =========================
     @Override
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
-    // =========================
-    // GET ALL USERS
-    // =========================
     @Override
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    // ================= DASHBOARD COUNTS =================
+    @Override
+    public long countAllUsers() {
+        return userRepository.count();
+    }
+
+    @Override
+    public long countActiveUsers() {
+        return userRepository.countByEnabledTrue();
+    }
+
+    @Override
+    public long countNewUsers() {
+        LocalDateTime last7Days = LocalDateTime.now().minusDays(7);
+        return userRepository.countByCreatedAtAfter(last7Days);
     }
 }

@@ -1,119 +1,147 @@
 <!DOCTYPE html>
-<html lang="en"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <meta charset="UTF-8">
-    <title th:text="${title}">Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+<meta charset="UTF-8">
+<title th:text="${title}">Dashboard</title>
+
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+/* Dark mode */
+.dark body { background:#1f2937; color:white; }
+/* Smooth sidebar width transition */
+#sidebar { transition: width 0.3s; }
+/* Sidebar tooltip for collapsed mode */
+.tooltip { display: none; position: absolute; left: 60px; top: 50%; transform: translateY(-50%); background: black; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; white-space: nowrap; z-index: 50; }
+.sidebar-item:hover .tooltip { display: block; }
+/* Scrollable main content */
+main { overflow-y: auto; }
+</style>
+
+<script>
+let sidebarCollapsed = false;
+
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    sidebarCollapsed = !sidebarCollapsed;
+    if(sidebarCollapsed){
+        sidebar.classList.add('w-20'); sidebar.classList.remove('w-64');
+        document.querySelectorAll('.sidebar-text').forEach(t=>t.classList.add('hidden'));
+        document.querySelectorAll('.submenu').forEach(s=>s.classList.add('hidden'));
+    } else {
+        sidebar.classList.add('w-64'); sidebar.classList.remove('w-20');
+        document.querySelectorAll('.sidebar-text').forEach(t=>t.classList.remove('hidden'));
+    }
+}
+
+function toggleSubMenu(id){
+    document.getElementById(id).classList.toggle('hidden');
+}
+
+function toggleDarkMode(){
+    document.documentElement.classList.toggle('dark');
+}
+
+function toggleProfileMenu(){
+    document.getElementById('profileMenu').classList.toggle('hidden');
+}
+
+const notifications = ["New user registered","New donation received","System maintenance scheduled"];
+function showNotifications(){ alert(notifications.join("\n")); }
+</script>
 </head>
 
-<body class="bg-gray-100 min-h-screen flex">
+<body class="flex h-screen bg-gray-100 dark:bg-gray-900">
 
-<!-- ================= SIDEBAR ================= -->
-<aside class="w-64 bg-gradient-to-b from-blue-700 to-blue-900 text-white flex flex-col">
-
-    <!-- Logo -->
-    <div class="p-5 text-2xl font-bold border-b border-blue-500">
-        🎓 Alumni
+<!-- Sidebar -->
+<aside id="sidebar" class="fixed top-0 left-0 z-50 h-full bg-blue-800 text-white w-64 flex flex-col overflow-y-auto">
+    <!-- User Info -->
+    <div class="flex flex-col items-start p-5 border-b">
+        <div class="flex items-center gap-2">
+            <div class="w-10 h-10 bg-blue-600 flex items-center justify-center rounded-full text-white font-bold" 
+                 sec:authentication="name" th:text="${#strings.substring(#authentication.name,0,1).toUpperCase()}">U</div>
+            <div class="flex flex-col sidebar-text">
+                <span th:text="${#authentication.name}">User Name</span>
+            </div>
+        </div>
+        <button onclick="toggleSidebar()" class="mt-2 md:hidden text-xl">☰</button>
     </div>
 
     <!-- Menu -->
-    <nav class="flex-1 p-4 space-y-2">
-
-        <a th:href="@{/dashboard}"
-           class="block px-4 py-2 rounded hover:bg-blue-600 transition">
-            🏠 Dashboard
+    <nav class="flex-1 p-2 space-y-1">
+        <!-- Dashboard -->
+        <a th:href="@{/dashboard}" class="flex items-center p-2 hover:bg-blue-600 rounded sidebar-item relative">
+            <span>🏠</span>
+            <span class="ml-3 sidebar-text">Dashboard</span>
+            <span class="tooltip">Dashboard</span>
         </a>
 
-        <a th:href="@{/profile}"
-           class="block px-4 py-2 rounded hover:bg-blue-600 transition">
-            👤 Profile
+        <!-- Settings -->
+        <a th:href="@{/settings}" class="flex items-center p-2 hover:bg-blue-600 rounded sidebar-item relative">
+            <span>⚙️</span>
+            <span class="ml-3 sidebar-text">Settings</span>
+            <span class="tooltip">Settings</span>
         </a>
 
-        <!-- ADMIN -->
-        <a sec:authorize="hasAuthority('administrator')"
-           th:href="@{/administrator/users}"
-           class="block px-4 py-2 rounded hover:bg-blue-600 transition">
-            ⚙️ Admin Panel
-        </a>
-
-        <!-- ADMIN + USER -->
-        <a sec:authorize="hasAnyAuthority('admin','administrator')"
-           th:href="@{/admin/manage}"
-           class="block px-4 py-2 rounded hover:bg-blue-600 transition">
-            📊 Manage
-        </a>
-
-        <!-- USER -->
-        <a sec:authorize="hasAnyAuthority('user','administrator','admin')"
-           th:href="@{/user/data}"
-           class="block px-4 py-2 rounded hover:bg-blue-600 transition">
-            📁 My Data
-        </a>
-
-        <!-- VIEWER -->
-        <a sec:authorize="hasAnyAuthority('viewer','admin','administrator')"
-           th:href="@{/viewer/report}"
-           class="block px-4 py-2 rounded hover:bg-blue-600 transition">
-            📄 Reports
-        </a>
-
+        <!-- Admin Menu -->
+        <div sec:authorize="hasAuthority('ADMINISTRATOR')">
+            <button onclick="toggleSubMenu('adminMenu')" class="flex justify-between items-center w-full p-2 hover:bg-blue-600 rounded sidebar-item relative">
+                <div class="flex items-center gap-3">
+                    <span>🛠️</span>
+                    <span class="sidebar-text">Admin</span>
+                </div>
+                <span>▸</span>
+                <span class="tooltip">Admin</span>
+            </button>
+            <div id="adminMenu" class="ml-6 mt-1 space-y-1 hidden submenu">
+                <a th:href="@{/administrator/users}" class="block p-2 hover:bg-blue-500 rounded">Users</a>
+                <a th:href="@{/administrator/roles}" class="block p-2 hover:bg-blue-500 rounded">Roles</a>
+                <a th:href="@{/administrator/settings}" class="block p-2 hover:bg-blue-500 rounded">Settings</a>
+            </div>
+        </div>
     </nav>
-
-    <!-- Logout -->
-    <div class="p-4 border-t border-blue-500">
-        <a th:href="@{/logout}"
-           class="block text-center bg-red-500 hover:bg-red-600 py-2 rounded">
-            🚪 Logout
-        </a>
-    </div>
 </aside>
 
-<!-- ================= MAIN CONTENT ================= -->
-<div class="flex-1 flex flex-col">
-
-    <!-- ================= TOPBAR ================= -->
-    <header class="bg-white shadow flex justify-between items-center px-6 py-4">
-
-        <h1 class="text-xl font-semibold text-gray-700">
-            Dashboard
-        </h1>
-
-        <!-- User Info -->
+<!-- Main Content -->
+<div class="flex-1 flex flex-col ml-64 md:ml-64 h-screen transition-all duration-300">
+    <!-- Header -->
+    <header class="fixed top-0 left-0 md:left-64 right-0 h-16 bg-white dark:bg-gray-800 shadow flex items-center justify-between px-6 z-40">
+        <div class="flex items-center gap-3">
+            <button onclick="toggleSidebar()" class="md:hidden text-2xl">☰</button>
+            <h1 class="text-xl font-bold" th:text="${title}">Dashboard</h1>
+        </div>
         <div class="flex items-center gap-4">
-
-            <span class="text-gray-600 font-medium"
-                  sec:authentication="name">
-                User Email
-            </span>
-
-            <!-- Avatar -->
-            <div class="w-10 h-10 bg-blue-600 text-white flex items-center justify-center rounded-full font-bold">
-                <span sec:authentication="name"
-                      th:text="${#strings.substring(#authentication.name,0,1).toUpperCase()}">
-                    U
-                </span>
+            <div class="relative">
+                <button onclick="showNotifications()" class="text-xl">🔔</button>
+                <span class="absolute -top-2 -right-2 bg-red-500 text-xs px-1 rounded-full">3</span>
             </div>
-
+            <button onclick="toggleDarkMode()" class="text-xl">🌙</button>
+            <div class="relative">
+                <button onclick="toggleProfileMenu()" class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center"
+                         sec:authentication="name" th:text="${#strings.substring(#authentication.name,0,1).toUpperCase()}">U</div>
+                </button>
+                <div id="profileMenu" class="hidden absolute right-0 mt-2 bg-white dark:bg-gray-700 shadow rounded w-40">
+                    <a th:href="@{/profile}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600">Profile</a>
+                    <a th:href="@{/settings}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600">Settings</a>
+                    <a th:href="@{/logout}" class="block px-4 py-2 text-red-500">Logout</a>
+                </div>
+            </div>
         </div>
     </header>
 
-    <!-- ================= PAGE CONTENT ================= -->
-    <main class="flex-1 p-6 overflow-auto">
-
-        <!-- Dynamic page load -->
+    <!-- Page Content -->
+    <main class="flex-1 p-6 mt-16 mb-16">
+        <!-- Dynamic page content -->
         <div th:replace="~{${page} :: content}"></div>
-
     </main>
 
-    <!-- ================= FOOTER ================= -->
-    <footer class="bg-white text-center py-3 shadow text-gray-600">
-        © 2026 Alumni System | Developed with ❤️
+    <!-- Footer -->
+    <footer class="fixed bottom-0 left-0 md:left-64 right-0 h-12 bg-white dark:bg-gray-800 flex items-center justify-center shadow">
+        © 2026 Alumni System
     </footer>
-
 </div>
-
 </body>
 </html>

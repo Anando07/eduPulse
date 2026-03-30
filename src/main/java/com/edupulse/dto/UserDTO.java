@@ -8,7 +8,6 @@ public class UserDTO {
 
     private Long id;
 
-    // ================= BASIC INFO =================
     @NotBlank(message = "Name is required")
     private String name;
 
@@ -24,11 +23,8 @@ public class UserDTO {
     private String confirmPassword;
 
     private String phone;
-
-    // ================= BLOOD INFO =================
     private String bloodGroup;
 
-    // ================= ACADEMIC INFO =================
     private String sscBoard;
     private String sscInstitution;
     private String sscGroup;
@@ -47,16 +43,12 @@ public class UserDTO {
     private Integer universityPassingYear;
 
     private String batch;
-
-    // ================= ADDRESS =================
     private String presentAddress;
     private String permanentAddress;
 
-    // ================= PROFESSIONAL =================
     private String jobType;
     private String designation;
 
-    // ================= PROFILE IMAGE =================
     private String profileImage;
 
     public Long getId() {
@@ -276,5 +268,7 @@ public class UserDTO {
     }
 
     // ================= GETTERS & SETTERS =================
+    // Generate all getters and setters
 
+    
 }

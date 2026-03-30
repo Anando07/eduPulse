@@ -8,17 +8,20 @@ import java.util.Optional;
 
 public interface UserService {
 
-    // Already exists
     User registerUser(UserDTO userDTO);
 
     Optional<User> findByEmail(String email);
 
-    List<User> getAllUsers();
-
-    // ✅ ADD THESE METHODS
     boolean existsByEmail(String email);
 
     User convertToEntity(UserDTO userDTO);
 
     User saveUser(User user);
+
+    List<User> getAllUsers();
+
+    // ✅ Dashboard counts
+    long countAllUsers();
+    long countActiveUsers();
+    long countNewUsers();
 }

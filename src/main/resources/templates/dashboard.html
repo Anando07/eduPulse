@@ -1,27 +1,50 @@
 <div th:fragment="content">
-
-    <h2 class="text-2xl font-bold mb-6 text-gray-700">
-        Welcome to Dashboard 🎉
-    </h2>
+    <h2 class="text-2xl font-bold mb-6">Dashboard Overview</h2>
 
     <!-- Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-        <div class="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
-            <h3 class="text-lg font-semibold text-gray-600">Total Users</h3>
-            <p class="text-3xl font-bold text-blue-600 mt-2">120</p>
+    <div class="grid md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded shadow">
+            <h3>Total Users</h3>
+            <p class="text-3xl text-blue-600 font-bold" th:text="${totalUsers}">120</p>
         </div>
 
-        <div class="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
-            <h3 class="text-lg font-semibold text-gray-600">Active Members</h3>
-            <p class="text-3xl font-bold text-green-600 mt-2">95</p>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded shadow">
+            <h3>Active Users</h3>
+            <p class="text-3xl text-green-600 font-bold" th:text="${activeUsers}">95</p>
         </div>
 
-        <div class="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
-            <h3 class="text-lg font-semibold text-gray-600">New Registrations</h3>
-            <p class="text-3xl font-bold text-purple-600 mt-2">12</p>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded shadow">
+            <h3>New Users</h3>
+            <p class="text-3xl text-purple-600 font-bold" th:text="${newUsers}">12</p>
         </div>
-
     </div>
 
+    <!-- Chart -->
+    <div class="bg-white dark:bg-gray-800 p-6 rounded shadow">
+        <canvas id="userChart"></canvas>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('userChart');
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr'],
+                datasets: [{
+                    label: 'Users',
+                    data: [10, 20, 30, 40],
+                    backgroundColor: ['#3b82f6', '#10b981', '#8b5cf6', '#f97316'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'top' },
+                    title: { display: true, text: 'User Growth (Monthly)' }
+                }
+            }
+        });
+    </script>
 </div>
