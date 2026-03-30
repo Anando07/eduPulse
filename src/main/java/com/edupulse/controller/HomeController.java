@@ -11,10 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 @Controller
 public class HomeController {
@@ -74,86 +71,21 @@ public class HomeController {
             return "pages/register";
         }
 
-        // Convert DTO to User entity
+        // Convert DTO → Entity
         User user = userService.convertToEntity(userDto);
 
-        // Initialize roles if null
         if (user.getRoles() == null) {
             user.setRoles(new HashSet<>());
         }
 
-        // Assign default ROLE_USER
-        Role role = roleService.findByName("ROLE_USER"); // Must match DB role name
+        // FIXED HERE
+        Role role = roleService.getRoleByName("ROLE_USER");
         user.getRoles().add(role);
 
-        // Save user
         userService.saveUser(user);
 
         model.addAttribute("successMessage", "Registration successful. Please login.");
         return "pages/login";
-    }
-
-    // ===== Dashboard =====
-    @GetMapping("/dashboard")
-    public String dashboard(Model model, Principal principal) {
-        User user = userService.findByEmail(principal.getName());
-        model.addAttribute("user", user);
-
-        // Role-based menu
-        List<String> roles = user.getRoles().stream().map(Role::getName).toList();
-        model.addAttribute("roles", roles);
-
-        model.addAttribute("content", "pages/dashboard :: dashboardContent");
-        model.addAttribute("pageTitle", "Dashboard");
-        return "layout";
-    }
-
-    // ===== Profile =====
-    @GetMapping("/profile")
-    public String profile(Model model, Principal principal) {
-        User user = userService.findByEmail(principal.getName());
-        model.addAttribute("user", user);
-        return "pages/profile";
-    }
-
-    @PostMapping("/profile")
-    public String updateProfile(@ModelAttribute("user") User user, Model model, Principal principal) {
-        User existingUser = userService.findByEmail(principal.getName());
-
-        // Update only allowed fields
-        existingUser.setName(user.getName());
-        existingUser.setPhone(user.getPhone());
-        existingUser.setBloodGroup(user.getBloodGroup());
-        existingUser.setPresentAddress(user.getPresentAddress());
-        existingUser.setPermanentAddress(user.getPermanentAddress());
-        existingUser.setJobType(user.getJobType());
-        existingUser.setDesignation(user.getDesignation());
-
-        // Update academic info
-        existingUser.setSscInstitution(user.getSscInstitution());
-        existingUser.setSscGroup(user.getSscGroup());
-        existingUser.setSscRoll(user.getSscRoll());
-        existingUser.setSscPassingYear(user.getSscPassingYear());
-
-        existingUser.setHscInstitution(user.getHscInstitution());
-        existingUser.setHscGroup(user.getHscGroup());
-        existingUser.setHscRoll(user.getHscRoll());
-        existingUser.setHscPassingYear(user.getHscPassingYear());
-
-        existingUser.setUniversityInstitution(user.getUniversityInstitution());
-        existingUser.setUniversitySubject(user.getUniversitySubject());
-        existingUser.setUniversityRoll(user.getUniversityRoll());
-        existingUser.setUniversityPassingYear(user.getUniversityPassingYear());
-
-        existingUser.setBatch(user.getBatch());
-
-        // Save updated user
-        userService.updateUser(existingUser);
-
-        model.addAttribute("successMessage", "Profile updated successfully");
-        model.addAttribute("user", existingUser);
-
-        return "pages/profile";
     }
 
     // ===== Error Page =====

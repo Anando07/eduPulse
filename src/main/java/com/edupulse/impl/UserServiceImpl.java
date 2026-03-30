@@ -27,53 +27,28 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    // =========================
+    // REGISTER USER (BEST PRACTICE)
+    // =========================
     @Override
     public User registerUser(UserDTO userDTO) {
-        // Check if email exists
-        if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
+
+        if (existsByEmail(userDTO.getEmail())) {
             throw new RuntimeException("Email already exists");
         }
 
-        // Password match validation
         if (!userDTO.getPassword().equals(userDTO.getConfirmPassword())) {
             throw new RuntimeException("Password and Confirm Password do not match");
         }
 
-        // Map DTO to entity
-        User user = new User();
-        user.setName(userDTO.getName());
-        user.setEmail(userDTO.getEmail());
-        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        user.setPhone(userDTO.getPhone());
-        user.setBloodGroup(userDTO.getBloodGroup());
-        user.setSscInstitution(userDTO.getSscInstitution());
-        user.setSscGroup(userDTO.getSscGroup());
-        user.setSscRoll(userDTO.getSscRoll());
-        user.setSscPassingYear(userDTO.getSscPassingYear());
-        user.setHscInstitution(userDTO.getHscInstitution());
-        user.setHscGroup(userDTO.getHscGroup());
-        user.setHscRoll(userDTO.getHscRoll());
-        user.setHscPassingYear(userDTO.getHscPassingYear());
-        user.setUniversityInstitution(userDTO.getUniversityInstitution());
-        user.setUniversitySubject(userDTO.getUniversitySubject());
-        user.setUniversityRoll(userDTO.getUniversityRoll());
-        user.setUniversityPassingYear(userDTO.getUniversityPassingYear());
-        user.setBatch(userDTO.getBatch());
-        user.setPresentAddress(userDTO.getPresentAddress());
-        user.setPermanentAddress(userDTO.getPermanentAddress());
-        user.setJobType(userDTO.getJobType());
-        user.setDesignation(userDTO.getDesignation());
-        user.setProfileImage(userDTO.getProfileImage());
+        User user = convertToEntity(userDTO);
 
-        // Assign default role ALUMNI
-        Role alumniRole = roleService.findByName("ROLE_ALUMNI")
+        // Assign default role
+        Role role = roleService.findByName("ROLE_ALUMNI")
                 .orElseGet(() -> roleService.saveRole(new Role("ROLE_ALUMNI")));
 
-        Set<Role> roles = new HashSet<>();
-        roles.add(alumniRole);
-        user.setRoles(roles);
+        user.setRoles(new HashSet<>(Set.of(role)));
 
-        // By default email/phone not verified
         user.setEmailVerified(false);
         user.setPhoneVerified(false);
         user.setEnabled(false);
@@ -81,11 +56,74 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
+    // =========================
+    // CHECK EMAIL EXISTS
+    // =========================
+    @Override
+    public boolean existsByEmail(String email) {
+        return userRepository.findByEmail(email).isPresent();
+    }
+
+    // =========================
+    // DTO → ENTITY CONVERSION
+    // =========================
+    @Override
+    public User convertToEntity(UserDTO userDTO) {
+
+        User user = new User();
+
+        user.setName(userDTO.getName());
+        user.setEmail(userDTO.getEmail());
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        user.setPhone(userDTO.getPhone());
+        user.setBloodGroup(userDTO.getBloodGroup());
+
+        user.setSscInstitution(userDTO.getSscInstitution());
+        user.setSscGroup(userDTO.getSscGroup());
+        user.setSscRoll(userDTO.getSscRoll());
+        user.setSscPassingYear(userDTO.getSscPassingYear());
+
+        user.setHscInstitution(userDTO.getHscInstitution());
+        user.setHscGroup(userDTO.getHscGroup());
+        user.setHscRoll(userDTO.getHscRoll());
+        user.setHscPassingYear(userDTO.getHscPassingYear());
+
+        user.setUniversityInstitution(userDTO.getUniversityInstitution());
+        user.setUniversitySubject(userDTO.getUniversitySubject());
+        user.setUniversityRoll(userDTO.getUniversityRoll());
+        user.setUniversityPassingYear(userDTO.getUniversityPassingYear());
+
+        user.setBatch(userDTO.getBatch());
+        user.setPresentAddress(userDTO.getPresentAddress());
+        user.setPermanentAddress(userDTO.getPermanentAddress());
+
+        user.setJobType(userDTO.getJobType());
+        user.setDesignation(userDTO.getDesignation());
+
+        user.setProfileImage(userDTO.getProfileImage());
+
+        return user;
+    }
+
+    // =========================
+    // SAVE USER
+    // =========================
+    @Override
+    public User saveUser(User user) {
+        return userRepository.save(user);
+    }
+
+    // =========================
+    // FIND BY EMAIL
+    // =========================
     @Override
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
+    // =========================
+    // GET ALL USERS
+    // =========================
     @Override
     public List<User> getAllUsers() {
         return userRepository.findAll();
