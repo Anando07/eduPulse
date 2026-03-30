@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${title}">Alumni</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+<!-- =========================
+     NAVBAR (Public Only)
+========================= -->
+<nav sec:authorize="!isAuthenticated()" class="bg-blue-600 text-white shadow">
+    <div class="container mx-auto flex justify-between items-center p-4">
+        <a th:href="@{/}" class="font-bold text-xl">🎓 Alumni</a>
+        <div class="space-x-4">
+            <a th:href="@{/}" class="hover:underline">Home</a>
+            <a th:href="@{/about}" class="hover:underline">About</a>
+            <a th:href="@{/news}" class="hover:underline">News</a>
+            <a th:href="@{/events/public}" class="hover:underline">Events</a>
+            <a th:href="@{/login}" class="bg-white text-blue-600 px-3 py-1 rounded">Login</a>
+            <a th:href="@{/register}" class="border px-3 py-1 rounded hover:bg-white hover:text-blue-600 transition">Register</a>
+        </div>
+    </div>
+</nav>
+
+<!-- =========================
+     PAGE CONTENT
+========================= -->
+<div th:fragment="layout (title, content)" class="flex-1 container mx-auto px-6 py-10">
+    <!-- Replace this div with page content -->
+    <div th:replace="${content}"></div>
+</div>
+
+<!-- =========================
+     FOOTER (Public Only)
+========================= -->
+<footer sec:authorize="!isAuthenticated()" class="bg-gray-800 text-white text-center p-4 mt-auto">
+    © 2026 Alumni System
+</footer>
+
+</body>
+</html>

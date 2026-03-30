@@ -1,4 +1,7 @@
-<div th:fragment="content">
+
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layouts/public_layout :: layout (~{::title}, ~{::content})}">
 
 <div class="container mt-5">
 
@@ -45,3 +48,4 @@
 </div>
 
 </div>
+</html>

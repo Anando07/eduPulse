@@ -27,29 +27,29 @@ public class HomeController {
     // ===== Public Pages =====
     @GetMapping({"/", "/home"})
     public String home() {
-        return "pages/home";
+        return "home"; // make sure home.html is under src/main/resources/templates/
     }
 
     @GetMapping("/about")
     public String about() {
-        return "pages/about";
+        return "about";
     }
 
     @GetMapping("/news")
     public String news() {
-        return "pages/news";
+        return "news";
     }
 
     // ===== Authentication Pages =====
     @GetMapping("/login")
     public String login() {
-        return "pages/login";
+        return "login"; // login page
     }
 
     @GetMapping("/register")
     public String register(Model model) {
         model.addAttribute("userDto", new UserDTO());
-        return "pages/register";
+        return "register"; // register page
     }
 
     @PostMapping("/register")
@@ -58,39 +58,37 @@ public class HomeController {
                                Model model) {
 
         if (result.hasErrors()) {
-            return "pages/register";
+            return "register";
         }
 
         if (!userDto.getPassword().equals(userDto.getConfirmPassword())) {
             model.addAttribute("passwordError", "Passwords do not match");
-            return "pages/register";
+            return "register";
         }
 
         if (userService.existsByEmail(userDto.getEmail())) {
             model.addAttribute("emailError", "Email already exists");
-            return "pages/register";
+            return "register";
         }
 
-        // Convert DTO → Entity
         User user = userService.convertToEntity(userDto);
 
         if (user.getRoles() == null) {
             user.setRoles(new HashSet<>());
         }
 
-        // FIXED HERE
         Role role = roleService.getRoleByName("ROLE_USER");
         user.getRoles().add(role);
 
         userService.saveUser(user);
 
         model.addAttribute("successMessage", "Registration successful. Please login.");
-        return "pages/login";
+        return "login";
     }
 
     // ===== Error Page =====
     @GetMapping("/403")
     public String accessDenied() {
-        return "pages/403";
+        return "403";
     }
 }
